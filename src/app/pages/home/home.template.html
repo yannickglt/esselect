@@ -1,0 +1,6 @@
+<div class="header">
+  <div class="logo">ESSelect</div>
+  <textarea class="json-selector-input" ng-model="home.selector" ng-change="home.update()" ng-model-options="{debounce: 300}"></textarea>
+  <div class="number-of-matches">{{home.matches.length || 0}} matches</div>
+</div>
+<ui-codemirror ng-model="home.code" ng-change="home.update()" ui-codemirror-opts="home.editorOptions" ng-model-options="{debounce: 300}"></ui-codemirror>

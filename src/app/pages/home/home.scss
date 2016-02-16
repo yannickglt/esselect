@@ -1,0 +1,57 @@
+@import "../../../../node_modules/codemirror/lib/codemirror.css";
+@import "../../../../node_modules/codemirror/theme/mbo.css";
+@import url(https://fonts.googleapis.com/css?family=Inconsolata);
+
+h1 {
+  font-size: 3rem;
+}
+
+.CodeMirror {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  font-family: 'Inconsolata';
+  font-size: 16px;
+  font-weight: 600;
+
+  .cm-matching-selection {
+    outline: 2px solid rgba(255,255,255,0.4);
+    color: #DDD;
+  }
+
+}
+
+.header {
+  display: flex;
+  border-bottom: 2px solid #444;
+  background-color: #666;
+}
+
+.logo, .number-of-matches {
+  flex: 1;
+  text-align: center;
+  line-height: 35px;
+  height: 35px;
+}
+.logo {
+  color: #FFF;
+  font-size: 26px;
+}
+.number-of-matches {
+  color: black;
+  font-size: 14px;
+}
+
+.json-selector-input {
+  flex: 4;
+  border: 0;
+  height: 35px;
+  font-size: 15px;
+  line-height: 15px;
+  color: #222;
+  border-left: 2px solid #444;
+  border-right: 2px solid #444;
+  background-color: #EEE;
+  vertical-align: top;
+  font-weight: 600;
+}
