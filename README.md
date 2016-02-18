@@ -2,6 +2,8 @@
 
 Select JavaScript source code blocks using JSONSelect and Esprima
 
+__[Live demo](https://yannickglt.github.io/esselect)__
+
 ## Installation
 
 To use it, just clone this repo and install the npm dependencies:
