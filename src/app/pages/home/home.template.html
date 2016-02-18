@@ -1,6 +1,18 @@
-<div class="header">
-  <div class="logo">ESSelect</div>
-  <textarea class="json-selector-input" ng-model="home.selector" ng-change="home.update()" ng-model-options="{debounce: 300}"></textarea>
-  <div class="number-of-matches">{{home.matches.length || 0}} matches</div>
-</div>
+<header class="header">
+  <div class="header-container">
+    <div class="logo">ESSelect</div>
+    <textarea class="json-selector-input" ng-model="home.selector" ng-change="home.update()" ng-model-options="{debounce: 200}"></textarea>
+    <div class="number-of-matches">
+      <span ng-if="home.status !== 'loading'">{{home.matches.length || 0}} matches</span>
+      <span ng-if="home.status === 'loading'">Loading...</span>
+    </div>
+  </div>
+</header>
 <ui-codemirror ng-model="home.code" ng-change="home.update()" ui-codemirror-opts="home.editorOptions" ng-model-options="{debounce: 300}"></ui-codemirror>
+<div class="error-growl" ng-if="home.error">
+  <div class="error-growl-title">Error in {{home.error.source}}</div>
+  <div class="error-growl-message">
+    <i class="start-quote">“</i>{{home.error.message}}<i class="end-quote">”</i>
+  </div>
+</div>
+<footer class="footer">ESSelect is based on <a href="https://github.com/jquery/esprima" target="_blank">Esprima</a> and <a href="https://github.com/lloyd/JSONSelect" target="_blank">JSONSelect</a>. Fork me on <a href="https://github.com/yannickglt/esselect" target="_blank">Github</a>.</footer>

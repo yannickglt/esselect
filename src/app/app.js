@@ -7,7 +7,6 @@ angular
   .module('app', [
     'app.home'
   ])
-  .config(($urlRouterProvider) => {
+  .config(/** @ngInject*/ ($urlRouterProvider) => {
     $urlRouterProvider.otherwise('/home')
   })
-

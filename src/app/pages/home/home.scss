@@ -2,12 +2,23 @@
 @import "../../../../node_modules/codemirror/theme/mbo.css";
 @import url(https://fonts.googleapis.com/css?family=Inconsolata);
 
-h1 {
-  font-size: 3rem;
+.app {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+}
+
+ui-codemirror {
+  position: relative;
+  flex: 1 100%;
 }
 
 .CodeMirror {
-  position: fixed;
+  position: absolute;
   height: 100%;
   width: 100%;
   font-family: 'Inconsolata';
@@ -15,16 +26,39 @@ h1 {
   font-weight: 600;
 
   .cm-matching-selection {
-    outline: 2px solid rgba(255,255,255,0.4);
+    outline: 2px solid rgba(255, 255, 255, 0.4);
     color: #DDD;
   }
 
 }
 
 .header {
-  display: flex;
+  display: block;
+  flex: 1 0;
   border-bottom: 2px solid #444;
   background-color: #666;
+}
+
+.header-container {
+  display: flex;
+}
+
+h1 {
+  font-size: 3rem;
+}
+
+.footer {
+  display: block;
+  flex: 1 0;
+  background-color: #666;
+  text-align: center;
+  color: #000;
+  font-size: 14px;
+  a {
+    color: #BBB;
+    text-decoration: none;
+    font-weight: 800;
+  }
 }
 
 .logo, .number-of-matches {
@@ -33,10 +67,12 @@ h1 {
   line-height: 35px;
   height: 35px;
 }
+
 .logo {
   color: #FFF;
   font-size: 26px;
 }
+
 .number-of-matches {
   color: black;
   font-size: 14px;
@@ -54,4 +90,37 @@ h1 {
   background-color: #EEE;
   vertical-align: top;
   font-weight: 600;
+}
+
+.error-growl {
+  position: absolute;
+  background-color: rgba(248, 0, 0, 0.25);
+  bottom: 25px;
+  right: 25px;
+  width: 450px;
+  padding: 10px;
+  color: #FFF;
+  border-radius: 2px;
+  line-height: 15px;
+  &:hover {
+    background-color: #7D1A1A;
+  }
+  .error-growl-title {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+}
+
+.start-quote, .end-quote {
+  font-size: 25px;
+}
+
+.start-quote {
+  margin-right: 10px;
+}
+
+.end-quote {
+  margin-left: 10px;
 }

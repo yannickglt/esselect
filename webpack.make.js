@@ -5,6 +5,7 @@ var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var ngAnnotatePlugin = require('ng-annotate-webpack-plugin');
 
 module.exports = function makeWebpackConfig (options) {
   /**
@@ -51,7 +52,7 @@ module.exports = function makeWebpackConfig (options) {
 
       // Output path from the view of the page
       // Uses webpack-dev-server in development
-      publicPath: BUILD ? '/' : 'http://localhost:8080/',
+      publicPath: BUILD ? '' : 'http://localhost:8080/',
 
       // Filename for entry points
       // Only adds hash in build mode
@@ -92,7 +93,14 @@ module.exports = function makeWebpackConfig (options) {
       // Transpile .js files using babel-loader
       // Compiles ES6 and ES7 into ES5 code
       test: /\.js$/,
-      loader: 'babel',
+      loader: 'ng-annotate'
+    }, {
+      // JS LOADER
+      // Reference: https://github.com/babel/babel-loader
+      // Transpile .js files using babel-loader
+      // Compiles ES6 and ES7 into ES5 code
+      test: /\.js$/,
+      loader: 'babel-loader',
       exclude: /node_modules/
     }, {
       // ASSET LOADER
@@ -109,7 +117,7 @@ module.exports = function makeWebpackConfig (options) {
       // Allow loading html through js
       test: /\.html$/,
       loader: 'raw'
-    },{
+    }, {
       test: /\.scss$/,
       loaders: ["style", "css", "sass"]
     }]

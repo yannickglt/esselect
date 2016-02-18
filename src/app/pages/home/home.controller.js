@@ -2,11 +2,18 @@ import esprima from 'esprima'
 import JSONSelect from 'JSONSelect';
 import CodeMirror from 'codemirror'
 
+const CODE_EXAMPLE = '// Life, Universe, and Everything\nvar answer = 6 * 7;'
+const SELECTOR_EXAMPLE = ':has(:root > .type:val("VariableDeclarator")) .id'
+
+
 class HomeController {
-  constructor(localStorageService) {
+  constructor($timeout, localStorageService) {
     this.localStorageService = localStorageService
+    this.$timeout = $timeout
 
     this.editor = null
+    this.error = null
+    this.status = 'ready'
     this.matches = []
 
     this.editorOptions = {
@@ -22,8 +29,8 @@ class HomeController {
       }
     }
 
-    this.selector = this.localStorageService.get('selector')
-    this.code = this.localStorageService.get('code')
+    this.selector = this.localStorageService.get('selector') || SELECTOR_EXAMPLE
+    this.code = this.localStorageService.get('code') || CODE_EXAMPLE
 
     this.initMatcher()
   }
@@ -51,27 +58,46 @@ class HomeController {
   }
 
   update() {
-    this.localStorageService.set('selector', this.selector)
-    this.localStorageService.set('code', this.code)
-    this.highlightMatches()
+    this.status = 'loading'
+    this.$timeout(() => {
+      this.localStorageService.set('selector', this.selector)
+      this.localStorageService.set('code', this.code)
+      this.highlightMatches()
+      this.status = 'ready'
+    })
   }
 
   highlightMatches() {
     if (this.editor) {
+      this.matches = []
+
+      let json
       try {
-        let json = esprima.parse(this.code, {
+        json = esprima.parse(this.code, {
           loc: true,
           comment: true
         })
-        this.matches = JSONSelect.match(this.selector, json)
-        if (this.matches) {
-          // @todo find a better way to refresh the overlay
-          this.editor.setOption('mode', 'esselect-overlay')
-        }
       } catch (e) {
-        console.error(e)
-        this.matches = []
+        this.error = {
+          source: 'Esprima',
+          message: e.message
+        }
+        return
       }
+
+      try {
+        this.matches = JSONSelect.match(this.selector, json)
+      } catch (e) {
+        this.error = {
+          source: 'JSONSelect',
+          message: e.message
+        }
+        return
+      }
+
+      // @todo find a better way to refresh the overlay
+      this.editor.setOption('mode', 'esselect-overlay')
+      this.error = null
     }
   }
 
@@ -80,18 +106,20 @@ class HomeController {
     let end = null
     if (this.matches.length > 0) {
       for (let match of this.matches) {
-        if (line > match.loc.start.line) {
-          start = 0;
-        }
-        else if ((line === match.loc.start.line) && (start === null || start > match.loc.start.column)) {
-          start = match.loc.start.column
-        }
+        if (match.loc && match.loc.start && match.loc.end) {
+          if (line > match.loc.start.line) {
+            start = 0;
+          }
+          else if ((line === match.loc.start.line) && (start === null || start > match.loc.start.column)) {
+            start = match.loc.start.column
+          }
 
-        if (line < match.loc.end.line) {
-          end = length;
-        }
-        else if ((line === match.loc.end.line) && (end === null || end < match.loc.end.column)) {
-          end = match.loc.end.column
+          if (line < match.loc.end.line) {
+            end = length;
+          }
+          else if ((line === match.loc.end.line) && (end === null || end < match.loc.end.column)) {
+            end = match.loc.end.column
+          }
         }
       }
     }
@@ -103,6 +131,6 @@ class HomeController {
 
 }
 
-HomeController.$inject = ['localStorageService']
+HomeController.$inject = ['$timeout', 'localStorageService']
 
 module.exports = HomeController

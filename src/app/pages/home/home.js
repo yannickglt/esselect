@@ -21,7 +21,7 @@ angular
     'ui.codemirror',
     'LocalStorageModule'
   ])
-  .config(($stateProvider) => {
+  .config(/** @ngInject*/ ($stateProvider) => {
     $stateProvider
       .state('home', {
         url: '/home',
