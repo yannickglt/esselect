@@ -1,132 +1,196 @@
 import esprima from 'esprima'
-import JSONSelect from 'JSONSelect';
+import escodegen from 'escodegen'
+import JSONSelect from 'JSONSelect'
 import CodeMirror from 'codemirror'
+import JavascriptMode from 'codemirror/mode/javascript/javascript'
+import MatchbracketsEdit from 'codemirror/addon/edit/matchbrackets'
+import ClosebracketsEdit from 'codemirror/addon/edit/closebrackets'
 
 const CODE_EXAMPLE = '// Life, Universe, and Everything\nvar answer = 6 * 7;'
 const SELECTOR_EXAMPLE = ':has(:root > .type:val("VariableDeclarator")) .id'
-
 
 class HomeController {
   constructor($timeout, localStorageService) {
     this.localStorageService = localStorageService
     this.$timeout = $timeout
 
-    this.editor = null
+    this.jsEditor = null
+    this.jsonEditor = null
     this.error = null
     this.status = 'ready'
     this.matches = []
+    this.markers = []
 
-    this.editorOptions = {
-      lineWrapping: true,
-      lineNumbers: true,
-      matchBrackets: true,
-      autoCloseBrackets: true,
-      mode: 'esselect-overlay',
-      theme: 'mbo',
-      onLoad: (editor) => {
-        this.editor = editor
-        this.highlightMatches()
-      }
-    }
+    Promise.all([this.initJsEditor(), this.initJsonEditor()])
+      .then(() => {
+        this.$timeout(() => {
+          this.jsToJson()
+        })
+      })
 
     this.selector = this.localStorageService.get('selector') || SELECTOR_EXAMPLE
-    this.code = this.localStorageService.get('code') || CODE_EXAMPLE
-
-    this.initMatcher()
+    this.jsCode = this.localStorageService.get('jscode') || CODE_EXAMPLE
+    this.json = null
+    this.jsonCode = null
   }
 
-  initMatcher() {
-    CodeMirror.defineMode('esselect-overlay', (config, parserConfig) => {
-      var overlay = {
-        token: (stream, state) => {
-          let columns = this.columnsByLine(state.lineNo + 1, stream.string.length)
-          if (stream.pos === columns.start) {
-            stream.pos = columns.end || stream.string.length
-            return 'matching-selection'
-          }
-          else if ((columns.start !== null) && (stream.pos < columns.start)) {
-            stream.pos = columns.start
-          }
-          else {
-            stream.skipToEnd()
-          }
-        }
-      }
-      let mode = CodeMirror.getMode(config, parserConfig.backdrop || 'text/javascript')
-      return CodeMirror.overlayMode(mode, overlay);
-    })
-  }
-
-  update() {
+  updateSelector() {
     this.status = 'loading'
     this.$timeout(() => {
       this.localStorageService.set('selector', this.selector)
-      this.localStorageService.set('code', this.code)
       this.highlightMatches()
       this.status = 'ready'
     })
   }
 
-  highlightMatches() {
-    if (this.editor) {
-      this.matches = []
-
-      let json
-      try {
-        json = esprima.parse(this.code, {
-          loc: true,
-          comment: true
-        })
-      } catch (e) {
-        this.error = {
-          source: 'Esprima',
-          message: e.message
+  initJsEditor() {
+    return new Promise((resolve) => {
+      this.jsEditorOptions = {
+        lineWrapping: true,
+        lineNumbers: true,
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        mode: 'application/javascript',
+        theme: 'mbo',
+        onLoad: (editor) => {
+          this.jsEditor = editor
+          resolve(editor)
         }
-        return
       }
+    })
+  }
 
-      try {
-        this.matches = JSONSelect.match(this.selector, json)
-      } catch (e) {
-        this.error = {
-          source: 'JSONSelect',
-          message: e.message
+  initJsonEditor() {
+    return new Promise((resolve) => {
+      this.jsonEditorOptions = {
+        lineWrapping: true,
+        lineNumbers: true,
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        mode: 'application/json',
+        theme: 'mbo',
+        onLoad: (editor) => {
+          this.jsonEditor = editor
+          resolve(editor)
         }
-        return
       }
+    })
+  }
 
-      // @todo find a better way to refresh the overlay
-      this.editor.setOption('mode', 'esselect-overlay')
-      this.error = null
+  updateJs() {
+    this.status = 'loading'
+    this.$timeout(() => {
+      this.localStorageService.set('jscode', this.jsCode)
+      this.jsToJson()
+      this.status = 'ready'
+    })
+  }
+
+  updateJson() {
+    this.status = 'loading'
+    this.$timeout(() => {
+      this.jsonToJs()
+      this.localStorageService.set('jscode', this.jsCode)
+      this.status = 'ready'
+    })
+  }
+
+  jsToJson() {
+    this.error = null
+    this.jsonCode = null
+
+    try {
+      this.json = esprima.parse(this.jsCode, {
+        loc: true,
+        attachComment: true
+      })
+    } catch (e) {
+      this.error = {
+        source: 'Esprima',
+        message: e.message
+      }
+      return
+    }
+
+    this.highlightMatches()
+  }
+
+  jsonToJs() {
+    this.error = null
+    this.js = null
+
+    try {
+      this.json = JSON.parse(this.jsonCode)
+      this.jsCode = escodegen.generate(this.json, {
+        comment: true
+      })
+    } catch (e) {
+      this.error = {
+        source: 'Escodegen',
+        message: e.message
+      }
+      return
+    }
+
+    this.highlightMatches()
+  }
+
+  calculateMatches() {
+    this.matches = []
+    try {
+      let matches = JSONSelect.stringify(this.selector, this.json)
+      this.matches = matches.matches
+      this.jsonCode = matches.json
+    } catch (e) {
+      this.error = {
+        source: 'JSONSelect',
+        message: e.message
+      }
+      return
     }
   }
 
-  columnsByLine(line, length) {
-    let start = null
-    let end = null
-    if (this.matches.length > 0) {
-      for (let match of this.matches) {
-        if (match.loc && match.loc.start && match.loc.end) {
-          if (line > match.loc.start.line) {
-            start = 0;
-          }
-          else if ((line === match.loc.start.line) && (start === null || start > match.loc.start.column)) {
-            start = match.loc.start.column
-          }
+  highlightMatches() {
+    this.calculateMatches()
 
-          if (line < match.loc.end.line) {
-            end = length;
-          }
-          else if ((line === match.loc.end.line) && (end === null || end < match.loc.end.column)) {
-            end = match.loc.end.column
-          }
+    if (this.matches.length > 0) {
+
+      for (let marker of this.markers) {
+        marker.clear()
+      }
+      this.markers = []
+    }
+
+    this.$timeout(() => {
+      for (let match of this.matches) {
+
+        if (this.jsEditor) {
+          let marker = this.jsEditor.markText({
+            line: match.match.loc.start.line - 1,
+            ch: match.match.loc.start.column
+          }, {
+            line: match.match.loc.end.line - 1,
+            ch: match.match.loc.end.column
+          }, {
+            className: 'cm-matching-selection'
+          })
+          this.markers.push(marker)
+        }
+
+        if (this.jsonEditor) {
+          let marker = this.jsonEditor.markText({
+            line: match.lineStart - 1,
+            ch: match.columnStart
+          }, {
+            line: match.lineEnd - 1,
+            ch: match.columnEnd
+          }, {
+            className: 'cm-matching-selection'
+          })
+          this.markers.push(marker)
         }
       }
-    }
-    return {
-      start: start,
-      end: end
-    }
+    })
   }
 
 }

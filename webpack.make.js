@@ -5,7 +5,6 @@ var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var ngAnnotatePlugin = require('ng-annotate-webpack-plugin');
 
 module.exports = function makeWebpackConfig (options) {
   /**
@@ -88,6 +87,9 @@ module.exports = function makeWebpackConfig (options) {
   config.module = {
     preLoaders: [],
     loaders: [{
+      test: /\.json$/,
+      loader: 'json'
+    }, {
       // JS LOADER
       // Reference: https://github.com/babel/babel-loader
       // Transpile .js files using babel-loader

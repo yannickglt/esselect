@@ -1,14 +1,17 @@
 <header class="header">
   <div class="header-container">
     <div class="logo">ESSelect</div>
-    <textarea class="json-selector-input" ng-model="home.selector" ng-change="home.update()" ng-model-options="{debounce: 200}"></textarea>
+    <textarea class="json-selector-input" ng-model="home.selector" ng-change="home.updateSelector()" ng-model-options="{debounce: 200}"></textarea>
     <div class="number-of-matches">
       <span ng-if="home.status !== 'loading'">{{home.matches.length || 0}} matches</span>
       <span ng-if="home.status === 'loading'">Loading...</span>
     </div>
   </div>
 </header>
-<ui-codemirror ng-model="home.code" ng-change="home.update()" ui-codemirror-opts="home.editorOptions" ng-model-options="{debounce: 300}"></ui-codemirror>
+<div class="editors">
+  <ui-codemirror ng-model="home.jsCode" ng-change="home.updateJs()" ui-codemirror-opts="home.jsEditorOptions" ng-model-options="{debounce: 300}"></ui-codemirror>
+  <ui-codemirror ng-model="home.jsonCode" ng-change="home.updateJson()" ui-codemirror-opts="home.jsonEditorOptions" ng-model-options="{debounce: 300}"></ui-codemirror>
+</div>
 <div class="error-growl" ng-if="home.error">
   <div class="error-growl-title">Error in {{home.error.source}}</div>
   <div class="error-growl-message">
