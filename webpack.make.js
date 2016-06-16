@@ -47,7 +47,7 @@ module.exports = function makeWebpackConfig (options) {
   } else {
     config.output = {
       // Absolute output directory
-      path: __dirname + '/public',
+      path: __dirname + '/dist',
 
       // Output path from the view of the page
       // Uses webpack-dev-server in development
@@ -232,7 +232,7 @@ module.exports = function makeWebpackConfig (options) {
    * Reference: http://webpack.github.io/docs/webpack-dev-server.html
    */
   config.devServer = {
-    contentBase: './public',
+    contentBase: './dist',
     stats: {
       modules: false,
       cached: false,

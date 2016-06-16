@@ -4,3 +4,4 @@ build
 npm-debug.log
 .idea
 .idea/*
+dist/
