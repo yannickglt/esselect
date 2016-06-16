@@ -10,9 +10,10 @@ const CODE_EXAMPLE = '// Life, Universe, and Everything\nvar answer = 6 * 7;'
 const SELECTOR_EXAMPLE = ':has(:root > .type:val("VariableDeclarator")) .id'
 
 class HomeController {
-  constructor($timeout, localStorageService) {
-    this.localStorageService = localStorageService
+  constructor($window, $timeout, localStorageService) {
+    this.$window = $window
     this.$timeout = $timeout
+    this.localStorageService = localStorageService
 
     this.jsEditor = null
     this.jsonEditor = null
@@ -196,8 +197,12 @@ class HomeController {
     })
   }
 
+  openJSONSelectWebsite() {
+    this.$window.open('https://github.com/lloyd/JSONSelect', '_blank')
+  }
+
 }
 
-HomeController.$inject = ['$timeout', 'localStorageService']
+HomeController.$inject = ['$window', '$timeout', 'localStorageService']
 
 module.exports = HomeController

@@ -82,6 +82,15 @@ h1 {
   font-size: 26px;
 }
 
+.question-mark {
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  cursor: pointer;
+  top: 5px;
+  right: 5px;
+}
+
 .number-of-matches {
   color: black;
   font-size: 14px;
@@ -120,6 +129,13 @@ h1 {
     font-size: 16px;
     text-align: center;
     margin-bottom: 10px;
+  }
+
+  .error-close-button {
+    height: 10px;
+    width: 10px;
+    float: right;
+    cursor: pointer;
   }
 }
 

@@ -137,17 +137,6 @@ a {
 	text-shadow: none;
 }
 
-// remove the gap between audio, canvas, iframes,
-// images, videos and the bottom of their containers
-audio,
-canvas,
-iframe,
-img,
-svg,
-video {
-	vertical-align: middle;
-}
-
 // allow only vertical resizing of textareas.
 textarea {
 	resize: vertical;
