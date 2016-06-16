@@ -1,10 +1,10 @@
 import esprima from 'esprima'
 import escodegen from 'escodegen'
 import JSONSelect from 'JSONSelect'
-import CodeMirror from 'codemirror'
-import JavascriptMode from 'codemirror/mode/javascript/javascript'
-import MatchbracketsEdit from 'codemirror/addon/edit/matchbrackets'
-import ClosebracketsEdit from 'codemirror/addon/edit/closebrackets'
+import 'codemirror'
+import 'codemirror/mode/javascript/javascript'
+import 'codemirror/addon/edit/matchbrackets'
+import 'codemirror/addon/edit/closebrackets'
 
 const CODE_EXAMPLE = '// Life, Universe, and Everything\nvar answer = 6 * 7;'
 const SELECTOR_EXAMPLE = ':has(:root > .type:val("VariableDeclarator")) .id'
@@ -102,8 +102,11 @@ class HomeController {
     try {
       this.json = esprima.parse(this.jsCode, {
         loc: true,
-        attachComment: true
+        comment: true,
+        tokens: true,
+        range: true
       })
+      this.json = escodegen.attachComments(this.json, this.json.comments, this.json.tokens)
     } catch (e) {
       this.error = {
         source: 'Esprima',
