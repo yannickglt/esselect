@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "description": "Select JavaScript source code blocks using JSONSelect and Esprima",
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean-dist": "rimraf dist",
+    "clean-source": "rimraf README.md src package.json karma.conf.js webpack.build.js webpack.config.js webpack.make.js webpack.test.js .babelrc",
     "build": "webpack --config webpack.build.js --bail",
     "dev": "webpack-dev-server --history-api-fallback --inline --progress",
     "test": "karma start",
@@ -57,6 +58,7 @@
     "phantomjs-prebuilt": "^2.1.4",
     "postcss-loader": "^0.8.0",
     "raw-loader": "^0.5.1",
+    "rimraf": "^2.5.2",
     "sass-loader": "^3.1.2",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.13",
@@ -65,8 +67,9 @@
   "gh-pages-deploy": {
     "staticpath": "dist",
     "prep": [
-      "clean",
-      "build"
+      "clean-dist",
+      "build",
+      "clean-source"
     ],
     "noprompt": true
   }
